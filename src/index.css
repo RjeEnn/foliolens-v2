@@ -1,13 +1,85 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: "Poppins", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.landing-gradient {
+  background: url("../public/bg.png");
+  background-size: cover;
+  background-position: 0 50%;
+}
+
+.partial-bg {
+  background: linear-gradient(180deg, #3720d2 90%, #ffffff 10%);
+}
+
+.partial-bg-2 {
+  background: linear-gradient(0deg, #ffffff 80%, #3720d2 20%);
+}
+
+.grid-a {
+  grid-auto-rows: 1fr;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+@layer base {
+  li {
+    @apply p-4;
+  }
+
+  .nav-l {
+    @apply text-white;
+  }
+
+  button {
+    @apply text-white bg-[#4C35E6] font-medium rounded-[5px]
+    hover:scale-[0.98] py-3 px-5;
+  }
+
+  section {
+    @apply p-8 w-full flex flex-col lg:flex-row gap-4 items-center justify-center;
+  }
+
+  .auth-logo {
+    @apply h-32 p-4 bg-indigo-200 rounded-full;
+  }
+
+  .grid > p {
+    @apply text-center text-sm;
+  }
+
+  .portal-page {
+    @apply w-full bg-gray-50 h-screen overflow-auto;
+  }
+
+  .portal-content {
+    @apply lg:ml-64 w-full lg:w-[calc(100%-16rem)] overflow-y-auto p-8;
+  }
+
+  .portal-headings {
+    @apply text-2xl font-bold;
+  }
+
+  .toggle-checkbox:checked {
+    @apply right-0 border-[#4C35E6];
+  }
+  .toggle-checkbox:checked + .toggle-label {
+    @apply bg-[#4C35E6];
+  }
 }
