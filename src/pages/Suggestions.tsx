@@ -1,28 +1,32 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LineChart,
   PortfolioIndexCard,
   RegenerationConfirmation,
   UserSidebar,
 } from "../components";
-import { user } from "../services/user";
+import { useAuth } from "../components/auth/Auth";
 
 const Suggestions = () => {
+  const auth = useAuth();
   const [closeValue, setCloseValue] = useState("0");
   const [closePercentage, setClosePercentage] = useState("0");
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      let percentage =
-        parseFloat(user.tracker.dates[user.tracker.dates.length - 1].value) -
-        parseFloat(user.tracker.dates[0].value);
-      let closeVal = 250000 * ((100 + percentage) / 100);
+    if (auth?.user) {
+      try {
+        let percentage =
+          parseFloat(
+            auth.user.tracker.dates[auth.user.tracker.dates.length - 1].value
+          ) - parseFloat(auth.user.tracker.dates[0].value);
+        let closeVal = 250000 * ((100 + percentage) / 100);
 
-      setClosePercentage(percentage.toFixed(2));
-      setCloseValue(closeVal.toFixed(2));
+        setClosePercentage(percentage.toFixed(2));
+        setCloseValue(closeVal.toFixed(2));
+      } catch (error) {}
     }
-  }, []);
+  }, [auth?.user]);
 
   // This useEffect sets the height of the Market Summary div to the total height
   // of the div containing the chart and the JSE Summary
@@ -57,7 +61,7 @@ const Suggestions = () => {
       <div className="portal-content">
         <div className="w-full p-4 flex flex-col-reverse lg:flex-row items-center justify-between gap-2">
           <h1 className="portal-headings">Suggestions</h1>
-          <p>Hi User!</p>
+          <p>Hi {auth?.user ? auth.user.firstName : "User"}!</p>
         </div>
 
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4 w-full">
@@ -72,9 +76,13 @@ const Suggestions = () => {
               <p>Portfolio %</p>
             </div>
             <div className="h-[calc(100%-200px)] overflow-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-300">
-              {user.portfolio.indices.map((index, pos) => (
-                <PortfolioIndexCard key={pos} index={index} />
-              ))}
+              {auth?.user?.portfolio.indices ? (
+                auth.user.portfolio.indices.map((index, pos) => (
+                  <PortfolioIndexCard key={pos} index={index} />
+                ))
+              ) : (
+                <p className="text-gray-500 text-center">Nothing to see here</p>
+              )}
             </div>
           </div>
 
@@ -124,7 +132,7 @@ const Suggestions = () => {
               <div className="w-full flex items-center justify-between mb-4">
                 <h3 className="font-bold text-lg">Personalized Suggestions</h3>
               </div>
-              <LineChart />
+              <LineChart Tracker={auth?.user?.tracker} />
             </div>
           </div>
         </div>

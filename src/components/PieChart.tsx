@@ -1,13 +1,10 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import Portfolio from "../models/types/Portfolio";
-import { user } from "../services/user";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const PieChart = () => {
-  const Portfolio: Portfolio = user.portfolio;
-
+const PieChart = ({ Portfolio }: { Portfolio: Portfolio | undefined }) => {
   const options = {
     plugins: {
       legend: {
@@ -17,11 +14,13 @@ const PieChart = () => {
   };
 
   const chartData = {
-    labels: Portfolio.indices.map((data) => data.ticker),
+    labels: Portfolio ? Portfolio.indices.map((data) => data.ticker) : [],
     datasets: [
       {
         label: "Users Gained",
-        data: Portfolio.indices.map((data) => parseFloat(data.weight)),
+        data: Portfolio
+          ? Portfolio.indices.map((data) => parseFloat(data.weight))
+          : [],
         backgroundColor: [
           "rgba(255, 99, 132, 1",
           "rgba(54, 162, 235, 1)",

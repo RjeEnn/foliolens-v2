@@ -29,6 +29,16 @@ body {
   grid-auto-rows: 1fr;
 }
 
+.circle-one {
+  animation-delay: 0.1s;
+}
+.circle-two {
+  animation-delay: 0.2s;
+}
+.circle-three {
+  animation-delay: 0.3s;
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;

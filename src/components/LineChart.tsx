@@ -10,7 +10,6 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import Tracker from "../models/types/Tracker";
-import { user } from "../services/user";
 
 ChartJS.register(
   CategoryScale,
@@ -22,9 +21,7 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = () => {
-  const Tracker: Tracker = user.tracker;
-
+const LineChart = ({ Tracker }: { Tracker: Tracker | undefined }) => {
   const options = {
     responsive: true,
     plugins: {
@@ -36,13 +33,16 @@ const LineChart = () => {
   };
 
   const chartData = {
-    labels: Tracker.dates.map((date) => date.date),
+    labels: Tracker ? Tracker.dates.map((date) => date.date) : [],
     datasets: [
       {
         label: "Growth %",
-        data: Tracker.dates.map(
-          (date) => parseFloat(date.value) - parseFloat(Tracker.dates[0].value)
-        ),
+        data: Tracker
+          ? Tracker.dates.map(
+              (date) =>
+                parseFloat(date.value) - parseFloat(Tracker.dates[0].value)
+            )
+          : [],
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },

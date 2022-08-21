@@ -6,11 +6,21 @@ import {
   CogIcon,
   LogoutIcon,
 } from "@heroicons/react/outline";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "./auth/Auth";
 
 const UserSidebar = () => {
   const location = useLocation().pathname;
+  const auth = useAuth();
+  const nav = useNavigate();
+
+  const handleLogout = () => {
+    if (auth) {
+      nav("/");
+      auth.logout();
+    }
+  };
 
   return (
     <aside className="hidden lg:block w-64 fixed top-0" aria-label="Sidebar">
@@ -74,13 +84,13 @@ const UserSidebar = () => {
               </li>
             </ul>
           </div>
-          <Link
-            to="/login"
-            className="flex items-center p-2 text-base font-normal text-red-500 rounded-lg hover:bg-red-100"
+          <button
+            className="flex items-center p-2 text-base font-normal bg-transparent text-red-500 rounded-lg hover:bg-red-100"
+            onClick={() => handleLogout()}
           >
             <LogoutIcon className="h-6" />
             <span className="ml-3 font-medium">Logout</span>
-          </Link>
+          </button>
         </div>
       </div>
     </aside>

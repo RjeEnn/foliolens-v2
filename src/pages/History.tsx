@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
-import { IndexCard, MarketPriceCard, UserSidebar } from "../components";
+import { IndexCard, Loader, MarketPriceCard, UserSidebar } from "../components";
 import { useParams } from "react-router-dom";
 import Index from "../models/types/Index";
-import { market } from "../services/market";
 import { useNavigate } from "react-router-dom";
+import {
+  fetchIndicesByDate,
+  fetchMarketActivityByDate,
+} from "../services/DailyActivityServices";
+import Markets from "../models/types/Markets";
+import TradingDay from "../models/TradingDay";
 
 const History = () => {
   let navigate = useNavigate();
@@ -20,6 +25,31 @@ const History = () => {
     []
   );
 
+  const [indices, setIndices] = useState<Markets | null>(null);
+  const [market, setMarket] = useState<TradingDay | null>(null);
+  const [loadingMarket, setLoadingMarket] = useState(true);
+  const [loadingIndices, setLoadingIndices] = useState(true);
+
+  useEffect(() => {
+    const getLatestInfo = async () => {
+      const indicesFromServer = await fetchIndicesByDate(
+        date || "",
+        setLoadingIndices
+      );
+      const marketFromServer = await fetchMarketActivityByDate(
+        date || "",
+        setLoadingMarket
+      );
+
+      setIndices(indicesFromServer);
+      setLoadingIndices(false);
+      setMarket(marketFromServer);
+      setLoadingMarket(false);
+    };
+
+    getLatestInfo();
+  }, [date]);
+
   useEffect(() => {
     if (market) {
       if (selectedMarket === "advancing") {
@@ -30,7 +60,7 @@ const History = () => {
         setSelectedMarketIndices(market.trading_firm);
       }
     }
-  }, [selectedMarket]);
+  }, [selectedMarket, market]);
 
   const handleDateChange = (e: any) => {
     e.preventDefault();
@@ -54,15 +84,25 @@ const History = () => {
 
         <div className="w-full bg-white rounded-md p-4 mb-4 shadow-md">
           <h3 className="font-bold">Indices</h3>
-          <div className="flex gap-4 w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-300 py-4">
-            <IndexCard />
-            <IndexCard />
-            <IndexCard />
-            <IndexCard />
-            <IndexCard />
-            <IndexCard />
-            <IndexCard />
-          </div>
+          {loadingIndices ? (
+            <Loader />
+          ) : indices ? (
+            <div className="flex gap-4 w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-300 py-4">
+              <IndexCard type="main" dailyIndex={indices.main} />
+              <IndexCard type="junior" dailyIndex={indices.junior} />
+              <IndexCard type="combined" dailyIndex={indices.combined} />
+              <IndexCard type="us" dailyIndex={indices.us} />
+              <IndexCard type="financial" dailyIndex={indices.financial} />
+              <IndexCard
+                type="manufacturing"
+                dailyIndex={indices.manufacturing}
+              />
+            </div>
+          ) : (
+            <div className="w-full">
+              <p className="text-center">No data for this day</p>
+            </div>
+          )}
         </div>
 
         <div className="w-full bg-white p-4 shadow-md">
@@ -124,13 +164,21 @@ const History = () => {
             <p>Percentage Change</p>
           </div>
           <div className="h-[calc(100%-200px)] overflow-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-300">
-            {selectedMarketIndices.map((index, pos) => (
-              <MarketPriceCard
-                key={pos}
-                selectedMarket={selectedMarket}
-                index={index}
-              />
-            ))}
+            {loadingMarket ? (
+              <Loader />
+            ) : market ? (
+              selectedMarketIndices.map((index, pos) => (
+                <MarketPriceCard
+                  key={pos}
+                  selectedMarket={selectedMarket}
+                  index={index}
+                />
+              ))
+            ) : (
+              <div className="w-full">
+                <p className="text-center">No data for this day</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

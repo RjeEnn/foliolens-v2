@@ -8,3 +8,4 @@ export { default as PieChart } from "./PieChart";
 export { default as LineChart } from "./LineChart";
 export { default as DateString } from "./DateString";
 export { default as RegenerationConfirmation } from "./RegenerationConfirmation";
+export { default as Loader } from "./Loader";

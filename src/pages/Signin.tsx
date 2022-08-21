@@ -1,13 +1,30 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import foliolensLogo from "../assets/folioLens-logo.png";
+import { useAuth } from "../components/auth/Auth";
+import { login } from "../services/AuthServices";
 
 const Signin = () => {
+  const auth = useAuth();
+  const nav = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+
+    if (auth) {
+      const [data, msg] = await login({ email, password });
+      if (typeof data === "object" && data?.hasOwnProperty("access_token")) {
+        auth.login(data?.access_token);
+        nav("/dashboard");
+      } else {
+        console.log(msg);
+      }
+    }
+    setLoading(false);
   };
 
   return (
@@ -55,7 +72,11 @@ const Signin = () => {
           />
           <hr className="border border-slate-400 my-8" />
           <button type="submit" className="w-full bg-[#4C35E6]">
-            Log in
+            {loading ? (
+              <div className="w-6 h-6 m-auto border-b-2 border-white rounded-full animate-spin"></div>
+            ) : (
+              "Log in"
+            )}
           </button>
 
           <hr className="border border-slate-400 my-8" />
