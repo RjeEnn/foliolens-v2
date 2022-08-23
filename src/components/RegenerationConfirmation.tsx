@@ -1,7 +1,14 @@
-import { Fragment, useRef, Dispatch, SetStateAction } from "react";
+import { Fragment, useRef, Dispatch, SetStateAction, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { ShieldExclamationIcon } from "@heroicons/react/outline";
+import { useAuth } from "./auth/Auth";
+import {
+  generatePortfolio,
+  GeneratePortfolio,
+  getAge,
+} from "../services/GeneratePortfolioServices";
+import { fetchMe } from "../services/AuthServices";
 
 type Dispatcher<S> = Dispatch<SetStateAction<S>>;
 
@@ -14,10 +21,31 @@ const RegenerationConfirmation = ({
 }) => {
   const cancelButtonRef = useRef(null);
   const navigate = useNavigate();
+  const auth = useAuth();
 
-  const handleRegen = () => {
-    navigate("../dashboard");
-    setOpen(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleRegen = async () => {
+    setLoading(true);
+    if (auth?.user) {
+      const body: GeneratePortfolio = {
+        userId: auth.user.id,
+        age: getAge(auth.user.dob),
+        salary: auth.user.salary,
+        net_worth: auth.user.netWorth,
+        reported_risk: auth.user.riskRating,
+      };
+      console.log(body);
+
+      await generatePortfolio(body);
+      const user = await fetchMe(auth?.tkn);
+      if (user) {
+        auth?.setUser(user);
+      }
+      navigate("../dashboard");
+      setOpen(false);
+    }
+    setLoading(false);
   };
 
   return (
@@ -77,14 +105,20 @@ const RegenerationConfirmation = ({
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-400 text-base font-medium text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={() => handleRegen()}
+                    disabled={loading}
                   >
-                    Regenerate
+                    {loading ? (
+                      <div className="w-6 h-6 m-auto border-b-2 border-white rounded-full animate-spin"></div>
+                    ) : (
+                      "Regenerate"
+                    )}
                   </button>
                   <button
                     type="button"
                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                     onClick={() => setOpen(false)}
                     ref={cancelButtonRef}
+                    disabled={loading}
                   >
                     Cancel
                   </button>

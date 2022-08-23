@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import foliolensLogo from "../assets/folioLens-logo.png";
 import { useAuth } from "../components/auth/Auth";
 import { login } from "../services/AuthServices";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Signin = () => {
   const auth = useAuth();
@@ -10,6 +12,12 @@ const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (auth?.tkn) {
+      nav("/dashboard");
+    }
+  });
 
   const handleSignin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,7 +29,27 @@ const Signin = () => {
         auth.login(data?.access_token);
         nav("/dashboard");
       } else {
-        console.log(msg);
+        if (typeof msg === "string") {
+          toast.error(msg, {
+            position: "top-center",
+            autoClose: 10000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        } else {
+          toast.error("Oops, something went wrong.", {
+            position: "top-center",
+            autoClose: 10000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        }
       }
     }
     setLoading(false);
@@ -71,7 +99,11 @@ const Signin = () => {
             className="form-control block w-full p-1.5 text-base font-normal bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 mb-4 focus:bg-white focus:border-indigo-700 focus:outline-none"
           />
           <hr className="border border-slate-400 my-8" />
-          <button type="submit" className="w-full bg-[#4C35E6]">
+          <button
+            type="submit"
+            className="w-full bg-[#4C35E6]"
+            disabled={loading}
+          >
             {loading ? (
               <div className="w-6 h-6 m-auto border-b-2 border-white rounded-full animate-spin"></div>
             ) : (
@@ -92,6 +124,17 @@ const Signin = () => {
           </p>
         </form>
       </div>
+      <ToastContainer
+        position="top-center"
+        autoClose={10000}
+        hideProgressBar={true}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

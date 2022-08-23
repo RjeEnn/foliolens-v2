@@ -9,11 +9,24 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "./auth/Auth";
+import { useEffect, useState } from "react";
 
 const UserSidebar = () => {
   const location = useLocation().pathname;
   const auth = useAuth();
   const nav = useNavigate();
+
+  const [suggestions, setSuggestions] = useState(true);
+
+  useEffect(() => {
+    if (auth?.user) {
+      if (auth.user.portfolio.indices.length === 0 || auth.user.generating) {
+        setSuggestions(false);
+      } else {
+        setSuggestions(true);
+      }
+    }
+  }, [auth?.user]);
 
   const handleLogout = () => {
     if (auth) {
@@ -47,11 +60,13 @@ const UserSidebar = () => {
               </li>
               <li>
                 <Link
-                  to="/suggestions"
+                  to={suggestions ? "/suggestions" : ""}
                   className={`${
                     location === "/suggestions"
                       ? "bg-indigo-700 text-white"
                       : ""
+                  } ${
+                    !suggestions ? "hover:bg-gray-500" : ""
                   } flex items-center p-2 text-base font-normal rounded-lg hover:bg-indigo-400`}
                 >
                   <ClipboardIcon className="h-6" />

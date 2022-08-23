@@ -4,8 +4,11 @@ import trackShot from "../assets/track-shot.png";
 import philosophyIcon from "../assets/philosophy-icon.png";
 import { HiOutlinePlay } from "react-icons/hi";
 import { FiLinkedin, FiGithub, FiGlobe } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
+  const navigate = useNavigate();
+
   return (
     <div id="landing-page" className="w-full mt-[80px] bg-white">
       <section className="bg-[#07031F] landing-gradient">
@@ -18,10 +21,15 @@ const Landing = () => {
             deserves better than risky, low-return investments. Let's help you.
           </p>
           <div className="flex items-center justify-between gap-4 mt-2">
-            <button>Get started</button>
-            <button className="flex items-center justify-center bg-transparent gap-2">
-              <HiOutlinePlay className="text-[#4C35E6] text-5xl" />
-              <p className="text-white text-md">Learn more about FolioLens</p>
+            <button onClick={() => navigate("/signup")}>Get started</button>
+            <button className="flex items-center justify-center bg-transparent">
+              <a
+                href="https://youtube.com"
+                className="flex items-center justify-center gap-2"
+              >
+                <HiOutlinePlay className="text-[#4C35E6] text-5xl" />
+                <p className="text-white text-md">Learn more about FolioLens</p>
+              </a>
             </button>
           </div>
         </div>
@@ -100,7 +108,9 @@ const Landing = () => {
             complicated math and finance if that's not your thing…just log in
             anytime to see how it's doing.
           </p>
-          <button>Get started for free</button>
+          <button onClick={() => navigate("/signup")}>
+            Get started for free
+          </button>
         </div>
         <div className="lg:shrink-0 lg:w-2/5">
           <img src={trackShot} alt="" />
@@ -109,7 +119,9 @@ const Landing = () => {
 
       <section className="bg-[#07031F] pt-12">
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-5xl font-bold text-white">Meet The Team</h1>
+          <h1 className="text-5xl text-center mb-8 font-bold text-white">
+            Meet The Team
+          </h1>
           <div className="flex flex-col lg:flex-row items-stretch justify-center gap-8 w-full lg:w-5/6">
             <div className="bg-white rounded-md p-8 lg:w-1/4 shadow-slate-400 shadow-md">
               <h2 className="my-2 text-lg font-bold">Jason DeCambre</h2>
@@ -127,19 +139,19 @@ const Landing = () => {
               <div className="flex gap-4 mt-4">
                 <a
                   className="bg-[#4C35E6] rounded-full p-2 hover:scale-95"
-                  href="https://google.com"
+                  href="https://jasondecambre.me/"
                 >
                   <FiGlobe className="text-2xl text-white" />
                 </a>
                 <a
                   className="bg-[#4C35E6] rounded-full p-2 hover:scale-95"
-                  href="https://google.com"
+                  href="http://www.linkedin.com/in/jasondecambre"
                 >
                   <FiLinkedin className="text-2xl text-white" />
                 </a>
                 <a
                   className="bg-[#4C35E6] rounded-full p-2 hover:scale-95"
-                  href="https://google.com"
+                  href="https://github.com/jasondecambre/"
                 >
                   <FiGithub className="text-2xl text-white" />
                 </a>
@@ -161,19 +173,19 @@ const Landing = () => {
               <div className="flex gap-4 mt-4">
                 <a
                   className="bg-[#4C35E6] rounded-full p-2 hover:scale-95"
-                  href="https://google.com"
+                  href="https://www.marlonjames.tech/"
                 >
                   <FiGlobe className="text-2xl text-white" />
                 </a>
                 <a
                   className="bg-[#4C35E6] rounded-full p-2 hover:scale-95"
-                  href="https://google.com"
+                  href="https://www.linkedin.com/in/marlon-jameswc/"
                 >
                   <FiLinkedin className="text-2xl text-white" />
                 </a>
                 <a
                   className="bg-[#4C35E6] rounded-full p-2 hover:scale-95"
-                  href="https://google.com"
+                  href="https://github.com/omisoul"
                 >
                   <FiGithub className="text-2xl text-white" />
                 </a>
@@ -200,13 +212,13 @@ const Landing = () => {
                 </a>
                 <a
                   className="bg-[#4C35E6] rounded-full p-2 hover:scale-95"
-                  href="https://google.com"
+                  href="https://www.linkedin.com/in/rojae-martin-965277211"
                 >
                   <FiLinkedin className="text-2xl text-white" />
                 </a>
                 <a
                   className="bg-[#4C35E6] rounded-full p-2 hover:scale-95"
-                  href="https://google.com"
+                  href="https://github.com/rjeenn"
                 >
                   <FiGithub className="text-2xl text-white" />
                 </a>
@@ -230,7 +242,10 @@ const Landing = () => {
             Start by getting your free stock portfolio suggestion today!
           </p>
           <div className="w-full lg:w-4/5 flex items-center justify-start gap-4 mt-2">
-            <button className="bg-white text-[#4C35E6] m-auto lg:m-0">
+            <button
+              className="bg-white text-[#4C35E6] m-auto lg:m-0"
+              onClick={() => navigate("/signup")}
+            >
               Get started for free
             </button>
           </div>

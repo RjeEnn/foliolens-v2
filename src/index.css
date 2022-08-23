@@ -75,7 +75,7 @@ input[type="number"] {
   }
 
   .portal-page {
-    @apply w-full bg-gray-50 h-screen overflow-auto;
+    @apply w-full bg-gray-50 h-screen overflow-auto pt-[80px] lg:pt-0;
   }
 
   .portal-content {

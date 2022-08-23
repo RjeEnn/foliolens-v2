@@ -16,14 +16,14 @@ const RequireAuth = ({ children }: { children: any }) => {
 
     if (setUser) {
       const fetchMe = async () => {
-        console.log(auth?.tkn);
-
         const res = await fetch(meUrl, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${auth?.tkn}`,
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
+            Origin: "",
+            Accept: "application/json",
           },
         });
         if (res.ok) {
@@ -37,7 +37,6 @@ const RequireAuth = ({ children }: { children: any }) => {
       fetchMe().then((data) => {
         setUserFetched(data);
         setLoading(false);
-        console.log(data);
       });
     }
   }, [auth?.tkn, auth?.setUser]);

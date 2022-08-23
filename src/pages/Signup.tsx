@@ -1,21 +1,95 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiskAssessmentModal } from "../components";
 import foliolensLogo from "../assets/folioLens-logo.png";
+import { useAuth } from "../components/auth/Auth";
+import { useNavigate } from "react-router-dom";
+import { signup } from "../services/AuthServices";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+interface SignUpFormBody {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  dob: string;
+  riskRating: number;
+  salary: number;
+  netWorth: number;
+}
 
 const Signup = () => {
   const [open, setOpen] = useState(false);
   const [riskAppetite, setRiskAppetite] = useState("4");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [salary, setSalary] = useState("");
-  const [netWorth, setNetWorth] = useState("");
+  const [salary, setSalary] = useState("0");
+  const [netWorth, setNetWorth] = useState("0");
   const [dob, setDob] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
+  const auth = useAuth();
+  const nav = useNavigate();
+
+  useEffect(() => {
+    if (auth) {
+      auth.logout();
+    }
+  });
+
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+
+    const body: SignUpFormBody = {
+      email,
+      password,
+      firstName,
+      lastName,
+      dob,
+      riskRating: parseInt(riskAppetite),
+      salary: parseFloat(salary),
+      netWorth: parseFloat(netWorth),
+    };
+
+    if (
+      password === confirmPassword &&
+      parseFloat(netWorth) >= parseFloat(salary)
+    ) {
+      if (auth) {
+        const [data, msg] = await signup(body);
+        if (typeof data === "object" && data?.hasOwnProperty("access_token")) {
+          auth.login(data?.access_token);
+          nav("/dashboard");
+        } else {
+          if (typeof msg === "string") {
+            toast.error(msg, {
+              position: "top-center",
+              autoClose: 10000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          } else {
+            toast.error("Oops, something went wrong.", {
+              position: "top-center",
+              autoClose: 10000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }
+        }
+      }
+    }
+    setLoading(false);
   };
 
   return (
@@ -44,6 +118,7 @@ const Signup = () => {
             First Name
           </label>
           <input
+            required
             type="text"
             className="form-control block w-full p-1.5 text-base font-normal bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 mb-4 focus:bg-white focus:border-indigo-700 focus:outline-none"
             id="first-name"
@@ -57,6 +132,7 @@ const Signup = () => {
             Last Name
           </label>
           <input
+            required
             type="text"
             className="form-control block w-full p-1.5 text-base font-normal bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 mb-4 focus:bg-white focus:border-indigo-700 focus:outline-none"
             id="last-name"
@@ -70,6 +146,7 @@ const Signup = () => {
             Date of Birth
           </label>
           <input
+            required
             type="date"
             id="dob"
             name="dob"
@@ -89,6 +166,7 @@ const Signup = () => {
           </p>
           <div className="flex gap-4 items-center">
             <input
+              required
               id="default-range"
               type="range"
               min="0"
@@ -109,10 +187,11 @@ const Signup = () => {
             </span>
           </p>
 
-          <label htmlFor="salary" className="form-label inline-block mb-2">
+          <label htmlFor="salary" className="form-label inline-block my-2">
             Salary (JMD)
           </label>
           <input
+            required
             type="number"
             className="form-control block w-full p-1.5 text-base font-normal bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 mb-4 focus:bg-white focus:border-indigo-700 focus:outline-none"
             id="salary"
@@ -126,6 +205,7 @@ const Signup = () => {
             Net Worth (JMD)
           </label>
           <input
+            required
             type="number"
             className="form-control block w-full p-1.5 text-base font-normal bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 mb-4 focus:bg-white focus:border-indigo-700 focus:outline-none"
             id="net-worth"
@@ -134,12 +214,20 @@ const Signup = () => {
             onChange={(e) => setNetWorth(e.target.value)}
             placeholder="Net Worth"
           />
+          {parseFloat(netWorth) < parseFloat(salary) ? (
+            <p className="text-sm text-red-600 italic mb-2">
+              Net worth cannot be less than salary
+            </p>
+          ) : (
+            ""
+          )}
 
           <label htmlFor="email" className="form-label inline-block mb-2">
             Email
           </label>
           <input
-            type="text"
+            required
+            type="email"
             id="email"
             name="email"
             value={email}
@@ -152,6 +240,7 @@ const Signup = () => {
             Password
           </label>
           <input
+            required
             type="password"
             id="password"
             name="password"
@@ -168,6 +257,7 @@ const Signup = () => {
             Confirm Password
           </label>
           <input
+            required
             type="password"
             id="confirm-password"
             name="confirm-password"
@@ -176,9 +266,24 @@ const Signup = () => {
             placeholder="Confirm Password"
             className="form-control block w-full p-1.5 text-base font-normal bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 mb-4 focus:bg-white focus:border-indigo-700 focus:outline-none"
           />
+          {confirmPassword !== password ? (
+            <p className="text-sm text-red-600 italic">
+              Passwords do not match
+            </p>
+          ) : (
+            ""
+          )}
           <hr className="border border-slate-400 my-8" />
-          <button type="submit" className="w-full bg-[#4C35E6]">
-            Sign Up
+          <button
+            type="submit"
+            className="w-full bg-[#4C35E6]"
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="w-6 h-6 m-auto border-b-2 border-white rounded-full animate-spin"></div>
+            ) : (
+              "Sign Up"
+            )}
           </button>
           <hr className="border border-slate-400 my-8" />
           <p className="text-center">
@@ -193,6 +298,17 @@ const Signup = () => {
           </p>
         </form>
       </div>
+      <ToastContainer
+        position="top-center"
+        autoClose={10000}
+        hideProgressBar={true}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

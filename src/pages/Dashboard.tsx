@@ -7,6 +7,7 @@ import {
   PieChart,
   UserSidebar,
 } from "../components";
+import generate from "../assets/generate.png";
 import { useAuth } from "../components/auth/Auth";
 import TradingDay from "../models/TradingDay";
 import Index from "../models/types/Index";
@@ -15,6 +16,13 @@ import {
   fetchLatestIndices,
   fetchLatestMarketActivity,
 } from "../services/DailyActivityServices";
+import { Link } from "react-router-dom";
+import {
+  generatePortfolio,
+  GeneratePortfolio,
+  getAge,
+} from "../services/GeneratePortfolioServices";
+import { fetchMe } from "../services/AuthServices";
 
 const Dashboard = () => {
   const auth = useAuth();
@@ -26,6 +34,9 @@ const Dashboard = () => {
   const [dailyMarket, setDailyMarket] = useState<TradingDay | null>(null);
   const [loadingMarket, setLoadingMarket] = useState(true);
   const [loadingIndices, setLoadingIndices] = useState(true);
+  const [loadingGen, setLoadingGen] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [emptyPortfolio, setEmptyPortfolio] = useState(false);
 
   // This useEffect sets the height of the Market Summary div to the total height
   // of the div containing the chart and the JSE Summary
@@ -69,6 +80,14 @@ const Dashboard = () => {
     }
   }, [selectedMarket, dailyMarket]);
 
+  useEffect(() => {
+    if (auth?.user) {
+      setGenerating(auth.user.generating);
+      setEmptyPortfolio(auth.user.portfolio.indices.length === 0);
+    }
+    setTimeout(setMarketDivHeight, 100);
+  }, [auth]);
+
   const setMarketDivHeight = () => {
     let marketDiv = document.getElementById("market-activity");
     let chartDiv = document.getElementById("chart-and-summary");
@@ -77,6 +96,46 @@ const Dashboard = () => {
       marketDiv.style.height = chartDiv.offsetHeight + "px";
     }
   };
+
+  const handleGenerate = async () => {
+    setLoadingGen(true);
+    if (auth?.user && auth?.tkn) {
+      const body: GeneratePortfolio = {
+        userId: auth.user.id,
+        age: getAge(auth.user.dob),
+        salary: auth.user.salary,
+        net_worth: auth.user.netWorth,
+        reported_risk: auth.user.riskRating,
+      };
+      console.log(body);
+
+      const genRes = await generatePortfolio(body);
+      if (genRes.result === "Process has started.") {
+        setGenerating(true);
+      }
+    }
+    setLoadingGen(false);
+  };
+
+  useEffect(() => {
+    const checkGenerating = async () => {
+      if (auth?.tkn && auth?.setUser) {
+        const user = await fetchMe(auth.tkn);
+
+        if (user) {
+          const updateUser = () => {
+            setGenerating(user.generating);
+            auth.setUser(user);
+          };
+          setTimeout(updateUser, 15000);
+        }
+      }
+    };
+
+    if (generating) {
+      checkGenerating();
+    }
+  }, [generating, auth]);
 
   return (
     <div className="portal-page">
@@ -119,9 +178,41 @@ const Dashboard = () => {
                   <h3 className="font-bold text-lg">
                     Personalized Suggestions
                   </h3>
-                  <button>hey</button>
+                  <button
+                    className={generating || emptyPortfolio ? "hidden" : ""}
+                  >
+                    <Link
+                      to={generating || emptyPortfolio ? "" : "/suggestions"}
+                    >
+                      View Breakdown
+                    </Link>
+                  </button>
                 </div>
-                <PieChart Portfolio={auth?.user?.portfolio} />
+                {generating === false && emptyPortfolio ? (
+                  <div className="w-full flex flex-col items-center justify-center gap-2 p-4">
+                    <img src={generate} alt="generate" className="w-2/3" />
+                    <p>Looks like you don't have a portfolio yet</p>
+                    <button
+                      onClick={() => handleGenerate()}
+                      disabled={loadingGen}
+                    >
+                      {loadingGen ? (
+                        <div className="w-6 h-6 m-auto border-b-2 border-white rounded-full animate-spin"></div>
+                      ) : (
+                        "Generate Now"
+                      )}
+                    </button>
+                  </div>
+                ) : generating ? (
+                  <div className="w-full flex flex-col items-center justify-center gap-2 text-center my-24">
+                    <p className="font-bold">Generating your portfolio now.</p>
+                    <Loader />
+                    <p>This process usually takes around 3-5 minutes.</p>
+                    <p>Feel free to browse the stock history while you wait.</p>
+                  </div>
+                ) : (
+                  <PieChart Portfolio={auth?.user?.portfolio} />
+                )}
               </div>
               <div className="w-full">
                 <div className="w-full bg-white p-4 shadow-md">

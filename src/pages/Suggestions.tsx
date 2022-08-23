@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LineChart,
   PortfolioIndexCard,
@@ -12,6 +13,7 @@ const Suggestions = () => {
   const [closeValue, setCloseValue] = useState("0");
   const [closePercentage, setClosePercentage] = useState("0");
   const [open, setOpen] = useState(false);
+  const nav = useNavigate();
 
   useEffect(() => {
     if (auth?.user) {
@@ -25,8 +27,14 @@ const Suggestions = () => {
         setClosePercentage(percentage.toFixed(2));
         setCloseValue(closeVal.toFixed(2));
       } catch (error) {}
+      if (
+        auth.user.portfolio.indices.length === 0 ||
+        auth.user.generating === true
+      ) {
+        nav("/dashboard");
+      }
     }
-  }, [auth?.user]);
+  }, [auth?.user, nav]);
 
   // This useEffect sets the height of the Market Summary div to the total height
   // of the div containing the chart and the JSE Summary

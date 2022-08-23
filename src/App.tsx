@@ -3,6 +3,7 @@ import {
   Dashboard,
   History,
   Landing,
+  NotFound,
   Settings,
   Signin,
   Signup,
@@ -53,6 +54,7 @@ function App() {
               </RequireAuth>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
