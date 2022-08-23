@@ -17,7 +17,7 @@ const Navbar = () => {
           location !== "/" && location !== "/signup" && location !== "/login"
             ? "hidden"
             : ""
-        } w-screen h-[80px] z-10 bg-[#07031F] fixed top-0`}
+        } w-screen h-[80px] z-50 bg-[#07031F] fixed top-0`}
       >
         <div className="px-8 flex justify-between items-center w-full h-full">
           <div className="w-full flex items-center justify-between">
@@ -88,7 +88,7 @@ const Navbar = () => {
           location.includes("/history/")
             ? ""
             : "hidden"
-        } w-screen h-[80px] lg:hidden z-10 bg-[#07031F] fixed top-0`}
+        } w-screen h-[80px] lg:hidden z-50 bg-[#07031F] fixed top-0`}
       >
         <div className="px-8 flex justify-between items-center w-full h-full">
           <div className="w-full flex items-center justify-between">
