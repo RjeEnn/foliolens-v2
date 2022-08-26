@@ -22,6 +22,7 @@ const Settings = () => {
   const [regenOpen, setRegenOpen] = useState(false);
   const [enableEdit, setEnableEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showNetMsg, setShowNetMsg] = useState(false);
 
   const auth = useAuth();
 
@@ -218,8 +219,13 @@ const Settings = () => {
             onChange={(e) => setNetWorth(e.target.value)}
             placeholder="Net Worth"
             disabled={!enableEdit}
+            onClick={() => setShowNetMsg(true)}
           />
-          {parseFloat(netWorth) < parseFloat(salary) ? (
+          {0 >= parseFloat(netWorth) && showNetMsg ? (
+            <p className="text-sm text-red-600 italic mb-2">
+              Net worth cannot be $0.00
+            </p>
+          ) : parseFloat(netWorth) < parseFloat(salary) ? (
             <p className="text-sm text-red-600 italic mb-2">
               Net worth cannot be less than salary
             </p>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { RiskAssessmentModal } from "../components";
 import foliolensLogo from "../assets/folioLens-logo.png";
 import { useAuth } from "../components/auth/Auth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signup } from "../services/AuthServices";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -30,6 +30,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showNetMsg, setShowNetMsg] = useState(false);
 
   const auth = useAuth();
   const nav = useNavigate();
@@ -57,7 +58,8 @@ const Signup = () => {
 
     if (
       password === confirmPassword &&
-      parseFloat(netWorth) >= parseFloat(salary)
+      parseFloat(netWorth) >= parseFloat(salary) &&
+      parseFloat(salary) > 0
     ) {
       if (auth) {
         const [data, msg] = await signup(body);
@@ -213,8 +215,13 @@ const Signup = () => {
             value={netWorth}
             onChange={(e) => setNetWorth(e.target.value)}
             placeholder="Net Worth"
+            onClick={() => setShowNetMsg(true)}
           />
-          {parseFloat(netWorth) < parseFloat(salary) ? (
+          {0 >= parseFloat(netWorth) && showNetMsg ? (
+            <p className="text-sm text-red-600 italic mb-2">
+              Net worth cannot be $0.00
+            </p>
+          ) : parseFloat(netWorth) < parseFloat(salary) ? (
             <p className="text-sm text-red-600 italic mb-2">
               Net worth cannot be less than salary
             </p>
@@ -288,12 +295,12 @@ const Signup = () => {
           <hr className="border border-slate-400 my-8" />
           <p className="text-center">
             Have an account?{" "}
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="text-[#4C35E6] hover:text-indigo-400 cursor-pointer mb-4"
             >
               Login
-            </a>{" "}
+            </Link>{" "}
             instead.
           </p>
         </form>
