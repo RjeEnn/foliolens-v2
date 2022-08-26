@@ -72,7 +72,7 @@ const Navbar = () => {
             </button>
             <button
               className="text-[#07031F] bg-white border border-white w-2/5"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/signup")}
             >
               Sign Up
             </button>
